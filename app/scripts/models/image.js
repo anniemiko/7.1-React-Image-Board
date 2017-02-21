@@ -5,7 +5,7 @@ var ImageModel = Backbone.Model.extend({
 });
 
 var ImageCollection = Backbone.Collection.extend({
-  model: idAttribute,
+  model: ImageModel,
   url: 'https://tiny-lasagna-server.herokuapp.com/collections/mikoimages'
 });
 

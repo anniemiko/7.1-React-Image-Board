@@ -1,66 +1,74 @@
 var React = require('react');
 var Backbone = require('backbone');
+var ReactDOM = require('react-dom');
+var _ = require('underscore');
 
 var Images = require('../models/image.js').ImageCollection;
 
-var ImageForm = React.createclassName({
+var ImageForm = React.createClass({
   getInitialState: function(){
-    return {show: false};
+    return {url: '', caption: '', show: false};
   },
   toggleForm: function(event){
 
   },
-  handleUrlChange: function(){
-  this.setStart({url: event.target.value})
+  handleUrlChange: function(event){
+    event.preventDefault();
+  this.setState({url: event.target.value});
   },
-  submitImage: function(){
-  this.props.submitImage(this.state)
+  handleCaptionChange: function(event){
+    event.preventDefault();
+  this.setState({caption: event.target.value});
+  },
+  submitImage: function(event){
+    event.preventDefault();
+    this.props.submitImage(this.state)
   },
   render: function(){
-    var imageForm = null;
+    var form = null;
     if(this.state.show){
-      imageForm = <form>
-        <div class="form-group">
+    var form = <form>
+        <div className="form-group">
           <label htmlFor="URL">Image url</label>
           <input onChange={this.handleUrlChange} type="url" className="form-control" id="url" placeholder="URL"/>
         </div>
-        <div class="form-group">
+        <div className="form-group">
             <label htmlFor="caption">Image caption</label>
-            <input onChange={this.handleUrlChange} type="text" className="form-control" id="caption" placeholder="caption"/>
+            <input onChange={this.handleCaptionChange} type="text" className="form-control" id="caption" placeholder="caption"/>
         </div>
-      </form>
-    }
-      // on each input do onChange={this.handleUrlChange}
+         <button type="submit" class="btn btn-default">Add</button>
+      </form>;
+    };
     return(
       <div>
         <button onClick={this.toggleForm}>Add</button>
-        {imageForm}
+        {form}
       </div>
     )
   }
 });
 
-var ImageListing = React.createclassName({
+var ImageListing = React.createClass({
 
-  render(){
-      var ImageList = this.props.images.map(function(image){
-        return
-          <div className="row">
+  render: function(){
+      var imageList = this.props.images.map(function(image){
+        return (<div className="row">
             <div className="col-sm-6 col-md-4">
               <div className="thumbnail">
-                <img src="..." alt="..."/>
+                <img src="{image.get('url')}" alt="..."/>
                 <div className="caption">
-                  <h3>{caption}</h3>
+                  <h3>{image.get('caption')}</h3>
                   <p><a href="#" className="btn btn-primary edit" role="button">Edit</a> <a href="#" className="btn btn-default delete" role="button">Delete</a></p>
                 </div>
               </div>
             </div>
           </div>
+        )
       });
   }
 });
 
-var ImagePage = React.createclassName({
+var ImageBoard = React.createClass({
   componentWillMount: function(){
     var self = this;
     this.props.images.fetch().done(function(){
@@ -68,23 +76,23 @@ var ImagePage = React.createclassName({
     });
   },
   getInitialState: function(){
-    var imagePics = new ImageCollection();
+   return {collection: this.props.images}
   },
-  submitImage = function(image){
+  submitImage: function(image){
   this.state.collection.create(image);
   this.setState({collection: this.state.collection});
   },
   render(){
-    return
-    <div>
-    <ImageForm submitImage = this.submitImage/>
-    <ImageListing pics={this.state.collection} />
-    </div>
+    return (<div>
+        <ImageForm submitImage = {this.submitImage} />
+        <ImageListing images={this.state.collection} />
+      </div>
+    )
   }
 });
 
 module.exports = {
   ImageForm,
   ImageListing,
-  ImagePage
+  ImageBoard
 }
